@@ -2,60 +2,67 @@ import { Injectable } from '@angular/core';
 
 @Injectable({ providedIn: 'root' })
 export class CoinLinksService {
+  /**
+   * Приватный хелпер для проверки наличия биржи (Case Insensitive)
+   */
+  private hasExchange(exchanges: string[], exchangeName: string): boolean {
+    if (!exchanges || exchanges.length === 0) return false;
+    const target = exchangeName.toLowerCase();
+    return exchanges.some((ex) => ex.toLowerCase().includes(target));
+  }
+
   coinglassLink(symbol: string, exchanges: string[]): string {
-    // Check if "Binance" is in exchanges
-    // Check if any exchange contains 'binance' (case-insensitive)
-    if (exchanges.some((exchange) => exchange.toLowerCase().includes('binance'))) {
+    // Приоритет проверок: Binance, затем Bybit (как в оригинале)
+    // 1. Binance
+    if (this.hasExchange(exchanges, 'binance')) {
       return `https://www.coinglass.com/tv/Binance_${symbol}USDT`;
     }
 
-    // Check if any exchange contains 'bybit' (case-insensitive) and none contain 'binance' (case-insensitive)
-    if (
-      exchanges.some((ex) => ex.toLowerCase().includes('bybit')) &&
-      !exchanges.some((ex) => ex.toLowerCase().includes('binance'))
-    ) {
+    // 2. Bybit (только если нет Binance)
+    if (this.hasExchange(exchanges, 'bybit')) {
       return `https://www.coinglass.com/tv/Bybit_${symbol}USDT`;
     }
 
-    // Default case (if none of the conditions match)
     return '';
   }
 
   tradingViewLink(symbol: string, exchanges: string[]): string {
-    // Check if any exchange contains 'bybit' (case-insensitive)
-    const hasBybit = exchanges.some((ex) => ex.toLowerCase().includes('bybit'));
-    // Check if any exchange contains 'binance' (case-insensitive)
-    const hasBinance = exchanges.some((ex) => ex.toLowerCase().includes('binance'));
-
-    if (hasBybit) {
+    // 1. Check Bybit
+    if (this.hasExchange(exchanges, 'bybit')) {
       return `https://www.tradingview.com/chart?symbol=BYBIT:${symbol}USDT.P`;
     }
 
-    if (hasBinance && !hasBybit) {
+    // 2. Check Binance (если Bybit не сработал)
+    if (this.hasExchange(exchanges, 'binance')) {
       return `https://www.tradingview.com/chart?symbol=BINANCE:${symbol}USDT.P`;
     }
 
     return '';
   }
 
-  exchangeLink(symbol: string, exchange: string) {
-    if (exchange.toLowerCase().includes('binance')) {
+  exchangeLink(symbol: string, exchange: string): string {
+    const ex = exchange.toLowerCase();
+
+    if (ex.includes('binance')) {
       return `https://www.binance.com/en/futures/${symbol}USDT`;
     }
-    if (exchange.toLowerCase().includes('bybit')) {
+    if (ex.includes('bybit')) {
       return `https://www.bybit.com/trade/usdt/${symbol}USDT`;
     }
 
     return '';
   }
 
-  exchangeLogoLink(exchange: string) {
-    if (exchange.toLowerCase().includes('binance')) {
-      return `assets/icons/binance-black.svg`;
+  exchangeLogoLink(exchange: string): string {
+    const ex = exchange.toLowerCase();
+
+    if (ex.includes('binance')) {
+      return 'assets/icons/binance-black.svg';
     }
-    if (exchange.toLowerCase().includes('bybit')) {
-      return `assets/icons/bybit.svg`;
+    if (ex.includes('bybit')) {
+      return 'assets/icons/bybit.svg';
     }
+
     return '';
   }
 }

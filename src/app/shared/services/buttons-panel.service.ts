@@ -1,68 +1,77 @@
-import { Injectable } from '@angular/core';
-import { BehaviorSubject, Subject } from 'rxjs';
+import { Injectable, signal } from '@angular/core';
+import { Subject } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class ButtonsPanelService {
-  //-------------IS ROTATING---------------------------
-  private isRotating = new BehaviorSubject<boolean>(false);
-  isRotating$ = this.isRotating.asObservable();
+  // ==========================================
+  // 🧠 STATE (Signals)
+  // Используем сигналы для хранения состояния UI
+  // ==========================================
 
+  // 1. Вращение иконки (Refresh)
+  private readonly _isRotating = signal<boolean>(false);
+  // Public Read-only Signal (если кому-то нужно подписаться реактивно)
+  readonly isRotating = this._isRotating.asReadonly();
+
+  // Getters/Setters для совместимости с шаблонами (чтобы не ломать [disabled]="service.isRotatingValue")
   get isRotatingValue(): boolean {
-    return this.isRotating.value;
+    return this._isRotating();
   }
-
   set isRotatingValue(value: boolean) {
-    this.isRotating.next(value);
+    this._isRotating.set(value);
   }
 
-  //------------------IS ASCENDING---------------------------
-  private isAscending = new BehaviorSubject<boolean>(false);
-  isAscending$ = this.isAscending.asObservable();
+  // 2. Направление сортировки
+  private readonly _isAscending = signal<boolean>(false);
+  readonly isAscending = this._isAscending.asReadonly();
 
   get isAscendingValue(): boolean {
-    return this.isAscending.value;
+    return this._isAscending();
   }
-
   set isAscendingValue(value: boolean) {
-    this.isAscending.next(value);
+    this._isAscending.set(value);
   }
 
-  //--------------- TOGGLE DELETING ----------------
-  private toggleDeletionSubject = new Subject<void>();
-  toggleDeletionSubject$ = this.toggleDeletionSubject.asObservable(); // Исправлено имя public поля для консистентности
+  // ==========================================
+  // ⚡ EVENTS (Action Streams)
+  // Используем Subject для событий (клики кнопок)
+  // ==========================================
+
+  // Toggle Deleting
+  private readonly _toggleDeletion = new Subject<void>();
+  readonly toggleDeletionSubject$ = this._toggleDeletion.asObservable();
 
   sendDeletionSignal() {
-    this.toggleDeletionSubject.next();
+    this._toggleDeletion.next();
   }
 
-  //--------------- TOGGLE SELECTION ----------------
-  private toggleSelectionSubject = new Subject<void>();
-  toggleSelectionSignal$ = this.toggleSelectionSubject.asObservable();
+  // Toggle Selection
+  private readonly _toggleSelection = new Subject<void>();
+  readonly toggleSelectionSignal$ = this._toggleSelection.asObservable();
 
   sendToggleSelectionSignal() {
-    this.toggleSelectionSubject.next();
+    this._toggleSelection.next();
   }
 
-  //--------------- TOGGLE REFRESH ----------------
-  private toggleRefreshSubject = new Subject<void>();
-  toggleRefreshSubject$ = this.toggleRefreshSubject.asObservable();
+  // Toggle Refresh
+  private readonly _toggleRefresh = new Subject<void>();
+  readonly toggleRefreshSubject$ = this._toggleRefresh.asObservable();
 
   sendRefreshSignal() {
-    this.toggleRefreshSubject.next();
-    // Логика из оригинала: включаем вращение, выключаем через 1с
-    this.isRotatingValue = true;
-    setTimeout(() => (this.isRotatingValue = false), 1000);
+    this._toggleRefresh.next();
+    // Логика UI: крутим иконку 1 секунду
+    this._isRotating.set(true);
+    setTimeout(() => this._isRotating.set(false), 1000);
   }
 
-  //--------------- TOGGLE SORT DIRECTION ----------------
-  private toggleSortDirectionSubject = new Subject<void>();
-  toggleSortDirectionSubject$ = this.toggleSortDirectionSubject.asObservable();
+  // Toggle Sort Direction
+  private readonly _toggleSortDirection = new Subject<void>();
+  readonly toggleSortDirectionSubject$ = this._toggleSortDirection.asObservable();
 
   sendSortDirectionSignal() {
-    // 1. СНАЧАЛА меняем состояние (было true -> стало false)
-    this.isAscendingValue = !this.isAscendingValue;
-
-    // 2. ПОТОМ уведомляем подписчиков (TriggeredAlerts), чтобы они взяли уже НОВОЕ значение
-    this.toggleSortDirectionSubject.next();
+    // 1. Меняем состояние сигнала
+    this._isAscending.update((v) => !v);
+    // 2. Уведомляем о событии
+    this._toggleSortDirection.next();
   }
 }

@@ -1,7 +1,6 @@
-import { Component, inject, OnInit, OnDestroy } from '@angular/core';
+import { Component, inject, OnInit, DestroyRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Subscription } from 'rxjs';
-
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute } from '@angular/router';
 
 // Models
@@ -18,80 +17,71 @@ import { SelectionService } from '../shared/services/generic.selection.service';
   templateUrl: './triggered-alerts.html',
   styleUrls: ['./triggered-alerts.scss'],
 })
-export class TriggeredAlertsComponent implements OnInit, OnDestroy {
+export class TriggeredAlertsComponent implements OnInit {
   // Services
   public alertsState = inject(AlertsStateService);
   public selectionService = inject(SelectionService<AlertBase>);
   private buttonsService = inject(ButtonsPanelService);
   private route = inject(ActivatedRoute);
+  private destroyRef = inject(DestroyRef);
 
-  private subs: Subscription = new Subscription();
   public currentType: AlertType = 'line'; // 'line' | 'vwap'
 
   ngOnInit(): void {
     // 1. Следим за URL (triggered/line или triggered/vwap)
-    this.subs.add(
-      this.route.data.subscribe((data) => {
-        // Приводим тип к AlertType
-        this.currentType = (data['type'] as AlertType) || 'line';
-        this.loadData();
-      })
-    );
+    this.route.data.pipe(takeUntilDestroyed(this.destroyRef)).subscribe((data) => {
+      this.currentType = (data['type'] as AlertType) || 'line';
+      this.loadData();
+    });
 
     // 2. Refresh Button
-    this.subs.add(
-      this.buttonsService.toggleRefreshSubject$.subscribe(() => {
+    this.buttonsService.toggleRefreshSubject$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         this.loadData();
-      })
-    );
+      });
 
     // 3. Delete Button
-    this.subs.add(
-      this.buttonsService.toggleDeletionSubject$.subscribe(() => {
+    this.buttonsService.toggleDeletionSubject$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         const selected = this.selectionService.selectedValues();
         if (selected.length === 0) return;
 
-        // Собираем массив ID
         const idsToDelete = selected.map((a) => a.id);
-
-        // Вызываем метод сервиса (deleteMany)
         this.alertsState.deleteMany(this.currentType, idsToDelete);
 
         this.selectionService.clear();
-      })
-    );
+      });
 
     // 4. Sort Button
-    this.subs.add(
-      this.buttonsService.toggleSortDirectionSubject$.subscribe(() => {
-        // Берем текущее направление из сервиса кнопок
+    this.buttonsService.toggleSortDirectionSubject$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         const isAsc = this.buttonsService.isAscendingValue;
         this.alertsState.sortAlerts(isAsc);
-      })
-    );
+      });
 
-    // Внутри ngOnInit()
-    this.subs.add(
-      this.buttonsService.toggleSelectionSignal$.subscribe(() => {
-        // Получаем текущий полный список алертов
+    // 5. Toggle Selection
+    this.buttonsService.toggleSelectionSignal$
+      .pipe(takeUntilDestroyed(this.destroyRef))
+      .subscribe(() => {
         const allAlerts = this.alertsState.alerts();
 
         if (allAlerts.length > 0) {
-          // Проходимся и выделяем каждый (или используем selectMany если есть)
-          allAlerts.forEach((alert) => this.selectionService.select(alert));
+          if (this.selectionService.isAllSelected(allAlerts)) {
+            this.selectionService.clear();
+          } else {
+            // ✅ ИСПРАВЛЕНИЕ: Используем спред-оператор (...)
+            this.selectionService.select(...allAlerts);
+          }
         }
-      })
-    );
+      });
   }
 
   loadData() {
     this.selectionService.clear();
-    // Вызываем loadTriggeredAlerts (как в твоем оригинале)
     this.alertsState.loadTriggeredAlerts(this.currentType);
-  }
-
-  ngOnDestroy(): void {
-    this.subs.unsubscribe();
   }
 
   onToggleSelection(alert: AlertBase) {

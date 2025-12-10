@@ -22,19 +22,47 @@ body {
 }
 
 // 3. Material SnackBar Overrides
-// Эти классы используются в NotificationService
 
-// SUCCESS / THUMB-UP (Уникальный стиль: иконка без фона)
-.thumb-up-snackbar {
-  .mdc-snackbar__surface {
-    background-color: transparent !important;
+/* --- SUCCESS / THUMB-UP (Уникальный стиль: иконка без фона) --- */
+/* Класс должен совпадать с тем, что в snackbar.service.ts (panelClass) */
+/* --- SUCCESS / THUMB-UP (Уникальный стиль: иконка без фона) --- */
+.thumb-up-snackbar-panel {
+  background: transparent !important;
+  box-shadow: none !important;
+  pointer-events: none;
+
+  /* Гарантируем центрирование самой панели */
+  justify-content: center !important;
+  margin-bottom: 15px !important;
+
+  .mat-mdc-snack-bar-container {
+    background: transparent !important;
     box-shadow: none !important;
-    --mdc-snackbar-supporting-text-color: orange;
+    border: none !important;
+    --mdc-snackbar-container-color: transparent;
+    --mdc-snackbar-supporting-text-color: transparent;
+
+    /* Важно: убираем паддинги контейнера, чтобы иконка была математически по центру */
+    padding: 0 !important;
+    min-width: auto !important;
+  }
+
+  .mat-mdc-snackbar-surface {
+    background: transparent !important;
+    box-shadow: none !important;
+    display: flex;
+    justify-content: center !important; /* Центрируем содержимое */
+    align-items: center !important;
+    width: 100%;
+    padding: 0 !important; /* Убираем внутренние отступы Material */
+  }
+
+  /* Убираем отступы у текстового лейбла внутри снекбара */
+  .mat-mdc-snack-bar-label {
+    padding: 0 !important;
     display: flex;
     justify-content: center;
-    text-align: center;
-    font-size: 24px;
-    min-width: unset !important; // Fix for Angular Material width constraints
+    width: 100%;
   }
 }
 
@@ -64,7 +92,7 @@ body {
   }
 }
 
-/* Глобальный стиль для полноэкранного диалога */
+/* Глобальный стиль для полноэкранного диалога (Screens Viewer) */
 .full-screen-modal {
   max-width: 100vw !important;
   width: 100vw !important;

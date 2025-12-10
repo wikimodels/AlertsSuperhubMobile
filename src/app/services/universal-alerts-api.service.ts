@@ -4,6 +4,7 @@ import { Observable, firstValueFrom, throwError } from 'rxjs';
 import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { NotificationService } from '../shared/services/notification.service';
+import { SnackbarService } from '../shared/services/snackbar.service'; // Добавлено
 import { AlertType, AlertStatus } from '../../models/alerts';
 
 interface ApiResponse<T = any> {
@@ -20,6 +21,7 @@ interface ApiResponse<T = any> {
 export class UniversalAlertsApiService {
   private http = inject(HttpClient);
   private notificationService = inject(NotificationService);
+  private snackbarService = inject(SnackbarService); // Внедряем новый сервис
 
   private readonly baseUrl = environment.alertsUrl;
 
@@ -104,8 +106,8 @@ export class UniversalAlertsApiService {
   ): Promise<boolean> {
     const obs$ = this.http.delete<ApiResponse>(`${this.baseUrl}/${type}/${status}/${id}`).pipe(
       tap(() => {
-        // Уведомление об успехе
-        this.notificationService.success(`${this.fmt(type)} Alert deleted`);
+        // ЗАМЕНА: Вместо текста показываем палец вверх
+        this.snackbarService.showIcon();
       }),
       catchError(this.handleError('Deleting Alert'))
     );
@@ -123,9 +125,8 @@ export class UniversalAlertsApiService {
       .post<ApiResponse>(`${this.baseUrl}/${type}/${status}/delete-batch`, ids)
       .pipe(
         tap((res) => {
-          this.notificationService.success(
-            `Deleted ${res.deletedCount} alerts from ${this.fmt(status)}`
-          );
+          // ЗАМЕНА: Вместо текста показываем палец вверх
+          this.snackbarService.showIcon();
         }),
         catchError(this.handleError('Deleting Alerts'))
       );
@@ -134,13 +135,12 @@ export class UniversalAlertsApiService {
     return res.deletedCount || 0;
   }
 
-  // 👇 ДОБАВЛЕНО: Удаление ВСЕХ алертов (понадобится для кнопок "Delete All")
+  // 👇 ДОБАВЛЕНО: Удаление ВСЕХ алертов
   public async deleteAllAlertsAsync(type: AlertType, status: AlertStatus): Promise<number> {
     const obs$ = this.http.delete<ApiResponse>(`${this.baseUrl}/${type}/${status}/all`).pipe(
       tap((res) => {
-        this.notificationService.warning(
-          `Deleted ALL ${res.deletedCount} ${this.fmt(type)} alerts`
-        );
+        // ЗАМЕНА: Вместо варнинга показываем палец вверх (операция успешна)
+        this.snackbarService.showIcon();
       }),
       catchError(this.handleError('Deleting All Alerts'))
     );

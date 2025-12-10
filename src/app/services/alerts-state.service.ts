@@ -17,15 +17,26 @@ export class AlertsStateService {
 
   /**
    * Загружает сработавшие алерты
+   * Ждет минимум 1.5 секунды (1 цикл анимации CSS), чтобы не было мерцания
    */
   async loadTriggeredAlerts(type: AlertType): Promise<void> {
     this.isLoading.set(true);
+
+    // 1. Создаем таймер на 1500мс (время анимации из CSS)
+    const minAnimationTime$ = new Promise((resolve) => setTimeout(resolve, 1200));
+
+    // 2. Создаем запрос к API
+    const dataRequest$ = this.api.getAlertsAsync<AlertBase>(type, 'triggered');
+
     try {
-      const data = await this.api.getAlertsAsync<AlertBase>(type, 'triggered');
+      // 3. Ждем выполнения ОБОИХ промисов параллельно
+      // Если API ответит за 0.1с, мы все равно будем ждать 1.5с
+      // Если API ответит за 5с, мы будем ждать 5с
+      const [_, data] = await Promise.all([minAnimationTime$, dataRequest$]);
+
       this.alerts.set(data);
     } catch (error) {
       console.error('State load error:', error);
-      // При ошибке можно обнулять список или оставлять старый
       this.alerts.set([]);
     } finally {
       this.isLoading.set(false);
@@ -36,10 +47,7 @@ export class AlertsStateService {
    * Удаляет один алерт
    */
   async deleteAlert(type: AlertType, id: string): Promise<void> {
-    // Оптимистичное обновление UI
     this.alerts.update((current) => current.filter((a) => a.id !== id));
-
-    // Запрос к API
     await this.api.deleteAlertAsync(type, 'triggered', id);
   }
 
@@ -48,11 +56,7 @@ export class AlertsStateService {
    */
   async deleteMany(type: AlertType, ids: string[]): Promise<void> {
     if (ids.length === 0) return;
-
-    // 1. Оптимистичное обновление (сразу убираем с экрана)
     this.alerts.update((current) => current.filter((a) => !ids.includes(a.id)));
-
-    // 2. Отправляем запрос
     await this.api.deleteAlertsBatchAsync(type, 'triggered', ids);
   }
 
@@ -66,28 +70,19 @@ export class AlertsStateService {
 
   /**
    * СОРТИРОВКА (Клиентская)
-   * Добавил этот метод, так как кнопка сортировки в панели обращается к нему.
-   * Он не делает запросов, просто меняет порядок в сигнале.
    */
   sortAlerts(isAscending: boolean): void {
     const current = [...this.alerts()];
 
     current.sort((a, b) => {
-      // 1. Принудительно приводим к числу. Если там null/undefined -> станет 0
-      // Если там битая строка -> станет NaN (и мы это обработаем)
       const timeA = Number(a.activationTime || 0);
       const timeB = Number(b.activationTime || 0);
-
-      // 2. Защита от NaN. Если прилетел мусор, считаем его равным 0
       const safeA = isNaN(timeA) ? 0 : timeA;
       const safeB = isNaN(timeB) ? 0 : timeB;
 
       return isAscending ? safeA - safeB : safeB - safeA;
     });
 
-    // 3. Дополнительная проверка: обновился ли массив?
-    // Иногда UI не перерисовывается, если ссылка на массив та же самая,
-    // но в Angular Signal .set([...]) создает новую ссылку, так что тут ок.
     this.alerts.set(current);
   }
 }

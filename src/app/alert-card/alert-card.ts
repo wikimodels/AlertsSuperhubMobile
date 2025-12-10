@@ -1,5 +1,4 @@
-import { Component, input, output } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, input, output, computed, ChangeDetectionStrategy } from '@angular/core';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatRippleModule } from '@angular/material/core';
@@ -8,9 +7,10 @@ import { AlertBase, VwapAlert } from '../../models/alerts';
 @Component({
   selector: 'app-alert-card',
   standalone: true,
-  imports: [CommonModule, MatCardModule, MatIconModule, MatRippleModule],
+  imports: [MatCardModule, MatIconModule, MatRippleModule],
   templateUrl: './alert-card.html',
   styleUrls: ['./alert-card.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush, // ✅ Orthodox Performance
 })
 export class AlertCard {
   alert = input.required<AlertBase>();
@@ -18,8 +18,13 @@ export class AlertCard {
   selected = input(false);
   toggle = output<void>();
 
-  getVwapTime(alert: AlertBase): string {
-    const str = (alert as VwapAlert).anchorTimeStr;
+  // ✅ Computed Signal: вычисляется только один раз при изменении alert()
+  anchorTimeFormatted = computed(() => {
+    const a = this.alert();
+    // Проверка типа через свойство, специфичное для VWAP
+    if (this.type() !== 'vwap') return '';
+
+    const str = (a as VwapAlert).anchorTimeStr;
     if (!str) return 'N/A';
 
     const date = new Date(str);
@@ -35,5 +40,5 @@ export class AlertCard {
     const seconds = pad(date.getSeconds());
 
     return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  }
+  });
 }

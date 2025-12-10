@@ -1,0 +1,25 @@
+/* Делаем сам хост-элемент флекс-контейнером */
+:host {
+  display: flex;
+  justify-content: center; /* Центрируем по горизонтали */
+  align-items: center;     /* Центрируем по вертикали */
+  width: 100%;
+}
+
+/* Убираем лишние отступы у обертки */
+.snackbar-content {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  text-align: center;
+}
+
+/* Гарантируем, что span с SVG ведет себя корректно */
+.snackbar-content span {
+  display: flex;
+}/* snackbar.component.css */
+
+
+
+

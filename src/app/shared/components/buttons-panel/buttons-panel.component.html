@@ -8,10 +8,6 @@
     <mat-icon svgIcon="refresh" [class.rotate]="isRotating()"></mat-icon>
   </button>
 
-  <button mat-icon-button (click)="onSendDeletionSignal()" [disabled]="count() === 0">
-    <mat-icon svgIcon="delete"></mat-icon>
-  </button>
-
   <button mat-icon-button (click)="onSortDirectionSignal()">
     <mat-icon [svgIcon]="isAscending() ? 'sort-up' : 'sort-down'"></mat-icon>
   </button>
@@ -22,6 +18,10 @@
 
   <button mat-icon-button (click)="onShowScreens()" [disabled]="count() === 0">
     <mat-icon svgIcon="mobile-loupe"></mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onSendDeletionSignal()" [disabled]="count() === 0">
+    <mat-icon svgIcon="delete"></mat-icon>
   </button>
 
 </div>
