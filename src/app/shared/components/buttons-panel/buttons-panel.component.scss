@@ -1,0 +1,70 @@
+:host {
+  display: block;
+  width: 100%;
+}
+
+.button-group {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-evenly; /* Равномерное распределение по ширине экрана */
+  width: 100%;
+  padding: 0 4px;
+}
+
+/* Счетчик внутри кнопки */
+/* Счетчик внутри кнопки */
+.counter {
+  /* 1. Отрываем элемент от "потока" текста */
+  position: absolute;
+
+  /* 2. Ставим точку привязки ровно в центр родителя (кнопки) */
+  top: 50%;
+  left: 50%;
+
+  /* 3. Сдвигаем сам элемент назад на 50% его размера, чтобы центр совпал с центром кнопки */
+  transform: translate(-50%, -50%);
+
+  /* 4. Стили шрифта */
+  font-size: 15px; /* Чуть уменьшил, чтобы не было тесно */
+  font-weight: 700;
+  color: inherit;
+
+  /* 5. Убиваем любые паразитные отступы */
+  margin: 0;
+  padding: 0;
+  line-height: 1; /* Важно! Чтобы высота строки не сдвигала текст */
+
+  /* 6. Блокируем клики по цифре, чтобы кликалась сама кнопка (на всякий случай) */
+  pointer-events: none;
+
+  /* ЕСЛИ ВСЁ РАВНО КРИВО (Оптическая коррекция):
+     Некоторые шрифты нарисованы так, что их мат. центр не совпадает с визуальным.
+     Меняй translate.
+
+     Поднять выше: transform: translate(-50%, -55%);
+     Опустить ниже: transform: translate(-50%, -45%);
+  */
+}
+
+/* Анимация вращения для кнопки Sync */
+.rotate {
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Стили для disabled кнопок (опционально, Material сам это делает, но для уверенности) */
+button[disabled] {
+  opacity: 0.5;
+}
+
+/* Touch targets fix if needed */
+.mat-mdc-icon-button {
+  width: 48px;
+  height: 48px;
+  padding: 12px;
+}

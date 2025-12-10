@@ -1,0 +1,33 @@
+<mat-card class="alert-card mat-elevation-z4" [class.selected]="selected()" matRipple (click)="toggle.emit()" matzindex>
+  <div class="card-header">
+    <img [src]="alert().symbol ? 'assets/logo/' + alert().symbol.toLowerCase() + '.svg' : 'assets/logo/noname.svg'"
+      alt="coin logo" class="coin-logo" />
+    <div class="symbol-info">
+      <span class="symbol">{{ alert().symbol }}</span>
+      <span class="category badge">Cat {{ alert().category }}</span>
+    </div>
+    <img [src]="type() === 'line' ? 'assets/icons/alarm.svg' : 'assets/icons/anchor.svg'" [alt]="type()"
+      class="type-icon" />
+  </div>
+
+  <mat-card-content class="card-body">
+    @if (type() === 'line') {
+    <div class="info-row">
+      <span class="label">Name:</span>
+      <span class="value">{{ alert().alertName }}</span>
+    </div>
+    }
+
+    @if (type() === 'vwap') {
+    <div class="info-row">
+      <span class="label">Anchor:</span>
+      <span class="value">{{ getVwapTime(alert()) }}</span>
+    </div>
+    }
+
+    <div class="info-row time">
+      <mat-icon class="tiny-icon" svgIcon="smart-alarm"></mat-icon>
+      <span class="value">{{ alert().activationTimeStr }}</span>
+    </div>
+  </mat-card-content>
+</mat-card>

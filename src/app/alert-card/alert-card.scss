@@ -1,0 +1,127 @@
+// === ПЕРЕМЕННЫЕ ===
+$primary-color: #3f51b5;
+$primary-light: rgba(63, 81, 181, 0.08);
+$ripple-color: rgba(63, 81, 181, 0.1);
+
+$text-primary: rgba(0, 0, 0, 0.87);
+$text-secondary: rgba(0, 0, 0, 0.6);
+$badge-bg: rgba(0, 0, 0, 0.08);
+
+$border-radius: 10px;
+$border-width: 2px;
+
+$shadow-default: 0 2px 8px rgba(0, 0, 0, 0.15);
+$shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.2);
+
+// === КАРТОЧКА ===
+.alert-card {
+  cursor: pointer;
+  border-radius: $border-radius;
+  transition: box-shadow 0.2s ease-out, transform 0.15s ease-out;
+
+  // СРАЗУ С ТЕНЬЮ
+  box-shadow: $shadow-default;
+
+  // НЕВИДИМАЯ РАМКА - чтобы размер не прыгал
+  border: $border-width solid transparent;
+
+  // ГЛАВНОЕ: убираем сжатие при клике
+  &:active {
+    transform: none !important;
+    box-shadow: $shadow-default !important;
+  }
+
+  // Выбранная карточка - меняем только цвет рамки
+  &.selected {
+    border-color: $primary-color;
+    background-color: $primary-light;
+    box-shadow: $shadow-default;
+  }
+
+  // При наведении - усиливаем тень
+  &:hover:not(:active) {
+    box-shadow: $shadow-hover;
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 16px;
+
+    .coin-logo {
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      object-fit: cover;
+    }
+
+    .symbol-info {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+
+      .symbol {
+        font-size: 16px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+
+      .badge {
+        font-size: 11px;
+        padding: 2px 8px;
+        border-radius: 12px;
+        background-color: $badge-bg;
+        color: $text-secondary;
+        width: fit-content;
+      }
+    }
+
+    .type-icon {
+      width: 24px;
+      height: 24px;
+      opacity: 0.6;
+    }
+  }
+
+  .card-body {
+    padding: 0 16px 12px !important;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+
+    .info-row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+
+      .label {
+        font-weight: 500;
+        color: $text-secondary;
+      }
+
+      .value {
+        color: $text-primary;
+      }
+
+      &.time {
+        .tiny-icon {
+          width: 16px;
+          height: 16px;
+          font-size: 16px;
+        }
+      }
+    }
+  }
+}
+
+// Настройка ripple
+:host ::ng-deep {
+  .alert-card {
+    .mat-ripple-element {
+      background-color: $ripple-color !important;
+    }
+  }
+}

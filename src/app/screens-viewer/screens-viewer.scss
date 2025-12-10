@@ -1,0 +1,150 @@
+/* Используем dvh, чтобы на мобилке низ не перекрывался адресной строкой */
+.viewer-container {
+  position: relative;
+  width: 100%;
+  height: 100vh;      /* Фоллбэк для старых браузеров */
+  height: 100dvh;     /* !!! FIX: Реальная высота мобильного экрана */
+  background-color: black;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+/* --- СЛАЙДЕР --- */
+.slider-track {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  transition: transform 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+  will-change: transform;
+  z-index: 1;
+}
+
+.slide {
+  min-width: 100%;
+  height: 100%;
+  overflow: hidden;
+  position: relative;
+  display: flex;           /* Гарантирует, что контейнер зума растянут */
+}
+
+/* --- ЗУМ + ПРОКРУТКА --- */
+.img-zoom-container {
+  width: 100%;
+  height: 100%;
+
+  /* Важно для центрирования незазумленной картинки */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  &.zoomed {
+    /* !!! FIX 1: Включаем скролл */
+    overflow: auto;
+
+    /* !!! FIX 2: Убираем жесткое выравнивание, чтобы работал margin: auto */
+    align-items: unset;
+    justify-content: unset;
+
+    -webkit-overflow-scrolling: touch; /* Плавный скролл на iOS */
+
+    .screen-img {
+      /* Задаем большой размер */
+      width: 250%;
+      max-width: none;
+      height: auto;
+      max-height: none;
+
+      /* !!! FIX 3: Магия центрирования.
+         Если картинка после зума всё ещё меньше экрана по вертикали,
+         margin: auto выставит её ровно по центру.
+         Если больше — даст скроллить. */
+      margin: auto;
+
+      transform: none;
+      cursor: zoom-out;
+    }
+  }
+}
+
+.screen-img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+  user-select: none;
+  /* pointer-events не трогаем, чтобы работали тапы */
+}
+
+/* --- КНОПКА ЗАКРЫТИЯ --- */
+.close-btn {
+  /* !!! FIX 4: position: fixed гарантирует, что кнопка всегда на экране */
+  position: fixed;
+  top: 16px;
+  right: 16px;
+
+  /* Учет челки (Notch) */
+  top: max(16px, env(safe-area-inset-top));
+
+  color: white;
+  background: rgba(0, 0, 0, 0.4);
+  transform: scale(1.2);
+  z-index: 9999; /* Максимальный слой */
+  cursor: pointer;
+}
+
+/* --- ИНДИКАТОР --- */
+.counter {
+  /* !!! FIX 5: position: fixed прибивает его к низу ЭКРАНА, а не контейнера */
+  position: fixed;
+
+  /* Поднимаем повыше, учитывая нижнюю полоску iOS */
+  bottom: max(30px, env(safe-area-inset-bottom));
+
+  left: 50%;
+  transform: translateX(-50%);
+
+  color: white;
+  background: rgba(30, 30, 30, 0.7);
+  padding: 6px 16px;
+  border-radius: 20px;
+  font-size: 14px;
+  font-weight: 500;
+  pointer-events: none;
+
+  z-index: 9999; /* Максимальный слой */
+}
+
+/* --- EMPTY STATE --- */
+.empty-state {
+  position: absolute;
+  top: 0; left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #ccc;
+  z-index: 0;
+
+  .empty-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+
+  .empty-title {
+    font-size: 20px;
+    font-weight: 500;
+    margin-bottom: 8px;
+    color: white;
+  }
+
+  .empty-subtitle {
+    font-size: 14px;
+    opacity: 0.7;
+  }
+}

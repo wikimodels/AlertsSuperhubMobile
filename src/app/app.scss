@@ -1,0 +1,26 @@
+:host {
+  display: block;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+// Контейнер для панели кнопок
+.sticky-panel {
+  position: sticky;
+  top: 56px; // Высота навбара (чтобы прилипало ровно под ним)
+  z-index: 100; // Поверх контента, но под навбаром (если у навбара z-index 1000)
+  background-color: #fafafa; // Цвет фона, чтобы контент не просвечивал
+  border-bottom: 1px solid #e0e0e0;
+  padding: 4px 8px;
+
+  // Компенсируем фиксированный навбар отступом сверху
+  margin-top: 56px;
+}
+
+main {
+  flex: 1; // Занимает всё оставшееся место
+  overflow-y: auto; // Скролл внутри main
+  background-color: #fafafa;
+  // Padding сверху больше не нужен, так как margin-top у панели его создал
+}

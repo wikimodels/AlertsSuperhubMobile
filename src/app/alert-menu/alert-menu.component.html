@@ -1,0 +1,16 @@
+<button mat-button [matMenuTriggerFor]="menu" class="menu-trigger">
+  <mat-icon svgIcon="menu"></mat-icon>
+  <span class="label">{{ selectedLabel }}</span>
+</button>
+
+<mat-menu #menu="matMenu">
+  <button mat-menu-item (click)="navigateTo('line')">
+    <mat-icon svgIcon="triggered-alarm" class="icon-line"></mat-icon>
+    <span>Triggered Line Alerts</span>
+  </button>
+
+  <button mat-menu-item (click)="navigateTo('vwap')">
+    <mat-icon svgIcon="anchor" class="icon-vwap"></mat-icon>
+    <span>Triggered Vwap Alerts</span>
+  </button>
+</mat-menu>

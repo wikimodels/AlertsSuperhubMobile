@@ -1,0 +1,27 @@
+<div class="button-group">
+
+  <button mat-icon-button (click)="onOpenTradingview()">
+    <mat-icon svgIcon="tv-negative"></mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onSendRefreshSignal()" [disabled]="isRotating()">
+    <mat-icon svgIcon="refresh" [class.rotate]="isRotating()"></mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onSendDeletionSignal()" [disabled]="count() === 0">
+    <mat-icon svgIcon="delete"></mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onSortDirectionSignal()">
+    <mat-icon [svgIcon]="isAscending() ? 'sort-up' : 'sort-down'"></mat-icon>
+  </button>
+
+  <button mat-icon-button (click)="onSendToggleSelectionSignal()">
+    <span class="counter">{{ count() }}</span>
+  </button>
+
+  <button mat-icon-button (click)="onShowScreens()" [disabled]="count() === 0">
+    <mat-icon svgIcon="mobile-loupe"></mat-icon>
+  </button>
+
+</div>

@@ -1,0 +1,24 @@
+<div class="alerts-grid-container">
+
+  @if (alertsState.isLoading()) {
+  <div class="loading-state">
+    <p>Загрузка сигналов...</p>
+  </div>
+  }
+
+  @else {
+  <div class="grid">
+    @for (alert of alertsState.alerts(); track alert.id) {
+    <app-alert-card [alert]="alert" [type]="currentType" [selected]="selectionService.isSelected(alert)"
+      (toggle)="onToggleSelection(alert)">
+    </app-alert-card>
+    }
+
+    @empty {
+    <div class="empty-state">
+      <p>Нет сработавших сигналов ({{ currentType }})</p>
+    </div>
+    }
+  </div>
+  }
+</div>
