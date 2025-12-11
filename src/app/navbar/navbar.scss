@@ -3,21 +3,44 @@
 }
 
 .navbar-container {
-  // Цвета из оригинала (nav-bar.component.css)
   background-color: #404040;
   color: whitesmoke;
 
-  // Mobile Fixed Positioning (Навбар всегда сверху)
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   z-index: 1000;
 
-  // Layout
   display: flex;
-  justify-content: space-between; // Разносим кнопки по краям
+  justify-content: space-between;
   align-items: center;
-  height: 56px; // Стандартная высота тулбара Material на мобильных
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2); // Тень для отделения от контента
+  height: 56px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+}
+
+// Стили для профиля пользователя
+.user-profile {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  .user-name {
+    font-size: 14px;
+    font-weight: 500;
+    // Скрываем имя на очень маленьких экранах, если нужно место
+    @media (max-width: 360px) {
+      display: none;
+    }
+  }
+
+  .user-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    border: 2px solid rgba(255, 255, 255, 0.2);
+    transition: border-color 0.2s;
+
+  }
 }

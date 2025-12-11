@@ -36,7 +36,7 @@ export class NotificationService {
     const panelClass = this.getPanelClass(type);
     const duration = durationMs ?? this.defaultDurations[type];
 
-    this.snackBar.open(message, 'Закрыть', {
+    this.snackBar.open(message, 'X', {
       duration: duration,
       panelClass: [panelClass], // panelClass должен быть массивом
       verticalPosition: 'top', // (Опционально) Показываем вверху

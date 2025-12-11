@@ -5,6 +5,7 @@ import {
   isDevMode,
   inject,
   provideAppInitializer,
+  importProvidersFrom, // ✅ Добавлено
 } from '@angular/core';
 import { provideRouter } from '@angular/router';
 
@@ -14,7 +15,13 @@ import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideAnimations } from '@angular/platform-browser/animations';
+import { MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Добавлено
 import { IconsRegistrarService } from './services/icons-registrar.service';
+
+// --- Firebase Imports ---
+import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
+import { getAuth, provideAuth } from '@angular/fire/auth';
+import { environment } from '../environments/environment';
 
 export const appConfig: ApplicationConfig = {
   providers: [
@@ -25,25 +32,25 @@ export const appConfig: ApplicationConfig = {
       enabled: !isDevMode(),
       registrationStrategy: 'registerWhenStable:30000',
     }),
-    // --- Стандартная настройка ---
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideAnimations(),
-    // --- Формы ---
-    // ✅ ПРАВИЛЬНЫЙ СПОСОБ для ReactiveFormsModule
-    //importProvidersFrom(ReactiveFormsModule),
 
-    // --- HTTP-клиент с поддержкой Interceptors ---
+    // --- UI & Animations ---
+    provideAnimations(),
+    importProvidersFrom(MatSnackBarModule), // ✅ Подключаем SnackBar для NotificationService
+
+    // --- HTTP ---
     provideHttpClient(withInterceptors([])),
 
-    // Инициализация
+    // --- Firebase Setup ---
+    provideFirebaseApp(() => initializeApp(environment.firebase)),
+    provideAuth(() => getAuth()),
+
+    // --- Init ---
     provideAppInitializer(() => {
       const registrar = inject(IconsRegistrarService);
-      // Возвращаем Promise, Angular будет ждать его выполнения перед рендером
       return registrar.registerIcons();
     }),
-    // --- Провайдеры для Angular Material ---
+
+    // --- Material Options ---
     {
       provide: MAT_FORM_FIELD_DEFAULT_OPTIONS,
       useValue: { appearance: 'outline' },

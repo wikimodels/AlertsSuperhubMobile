@@ -1,0 +1,19 @@
+:host {
+        display: flex;
+        flex-direction: column;
+        height: 100%;
+      }
+      .sticky-panel {
+        position: sticky;
+        top: 56px;
+        z-index: 100;
+        background-color: #fafafa;
+        border-bottom: 1px solid #e0e0e0;
+        padding: 4px 8px;
+        margin-top: 56px;
+      }
+      main {
+        flex: 1;
+        overflow-y: auto;
+        background-color: #fafafa;
+      }

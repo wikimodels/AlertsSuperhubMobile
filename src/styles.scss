@@ -1,6 +1,6 @@
 /* You can add global styles to this file, and also import other style files */
 /* Global Styles */
-
+@use './styles/main_snackbar';
 // 1. Reset & Fonts
 html, body {
   height: 100%;
@@ -21,7 +21,11 @@ body {
   --swiper-pagination-bullet-inactive-opacity: 1;
 }
 
-// 3. Material SnackBar Overrides
+
+/* 1. Глобальный Z-Index (чтобы было поверх всего) */
+.cdk-global-overlay-wrapper, .cdk-overlay-container {
+  z-index: 99999 !important;
+}
 
 /* --- SUCCESS / THUMB-UP (Уникальный стиль: иконка без фона) --- */
 /* Класс должен совпадать с тем, что в snackbar.service.ts (panelClass) */
