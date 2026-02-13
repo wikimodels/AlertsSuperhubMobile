@@ -1,6 +1,7 @@
 <mat-toolbar class="navbar-container">
 
-  <button mat-icon-button (click)="onGoToBitcoin()">
+  <!-- Логотип вернул на место (слева) -->
+  <button mat-icon-button class="logo-btn" (click)="onGoToBitcoin()">
     <mat-icon svgIcon="bitcoin"></mat-icon>
   </button>
 
@@ -10,14 +11,16 @@
   <div class="user-profile">
     <span class="user-name">Hi, {{ currentUser.displayName?.split(' ')?.[0] }}!</span>
     <img [src]="currentUser.photoURL" alt="Avatar" class="user-avatar">
+
     <button mat-icon-button (click)="logout()">
       <mat-icon svgIcon="logout"></mat-icon>
     </button>
   </div>
   } @else {
-  <button mat-icon-button (click)="login()">
-    <mat-icon svgIcon="login"></mat-icon>
-  </button>
+  <div class="user-profile">
+    <button mat-icon-button (click)="login()">
+      <mat-icon svgIcon="login"></mat-icon>
+    </button>
+  </div>
   }
-
 </mat-toolbar>

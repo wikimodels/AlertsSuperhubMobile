@@ -16,18 +16,19 @@
   justify-content: space-between;
   align-items: center;
   height: 56px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 // Стили для профиля пользователя
 .user-profile {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 0; // Убрал gap, чтобы элементы были ближе (или можно gap: 4px)
 
   .user-name {
     font-size: 14px;
     font-weight: 500;
+
     // Скрываем имя на очень маленьких экранах, если нужно место
     @media (max-width: 360px) {
       display: none;
@@ -43,4 +44,12 @@
     transition: border-color 0.2s;
 
   }
+}
+
+
+// Уменьшенный логотип на ~15%
+// Уменьшенный логотип на ~15%
+.logo-btn {
+  transform: scale(0.85); // Безопасное уменьшение с сохранением центрирования
+  margin-left: -4px; // Компенсация отступа после scale
 }
