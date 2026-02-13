@@ -1,6 +1,8 @@
 import { Injectable, NgZone, inject } from '@angular/core';
 import { SwUpdate, VersionReadyEvent } from '@angular/service-worker';
 import { filter } from 'rxjs/operators';
+import { LoggerService } from '../shared/services/logger.service';
+import { TIMING } from '../../consts';
 
 @Injectable({
   providedIn: 'root',
@@ -8,11 +10,12 @@ import { filter } from 'rxjs/operators';
 export class SwUpdateService {
   private swUpdate = inject(SwUpdate);
   private ngZone = inject(NgZone);
+  private logger = inject(LoggerService);
 
   init() {
     // 1. Проверка включения Service Worker
     if (!this.swUpdate.isEnabled) {
-      console.log('Service workers are not enabled.');
+      this.logger.info('Service workers are not enabled.');
       return;
     }
 
@@ -21,9 +24,9 @@ export class SwUpdateService {
     this.swUpdate.versionUpdates
       .pipe(filter((evt): evt is VersionReadyEvent => evt.type === 'VERSION_READY'))
       .subscribe((event) => {
-        console.log('New version available:', event);
-        console.log('Current version:', event.currentVersion);
-        console.log('Available version:', event.latestVersion);
+        this.logger.info('New version available:', event);
+        this.logger.debug('Current version:', event.currentVersion);
+        this.logger.debug('Available version:', event.latestVersion);
 
         // Логика из старого проекта:
         // Ждем 10 секунд, затем спрашиваем пользователя.
@@ -34,7 +37,7 @@ export class SwUpdateService {
           } else {
             this.activateUpdate(); // Force reload after timeout/cancel
           }
-        }, 10000); // 10 seconds
+        }, TIMING.SW_UPDATE_PROMPT_DELAY); // 10 seconds
 
         // Очистка таймаута, если пользователь перезагрузил страницу сам раньше
         window.addEventListener('beforeunload', () => clearTimeout(timeout));

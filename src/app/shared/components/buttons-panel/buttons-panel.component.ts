@@ -11,7 +11,7 @@ import { SelectionService } from '../../services/generic.selection.service';
 import { CoinLinksService } from '../../services/coin-links.service';
 import { AlertBase } from '../../../../models/alerts';
 import { runVibration } from '../../../functions/run-vibration';
-import { VIBRATIONS } from '../../../../consts';
+import { VIBRATIONS, TIMING, UI } from '../../../../consts';
 import { ScreensViewer } from '../../../screens-viewer/screens-viewer';
 
 @Component({
@@ -42,11 +42,11 @@ export class ButtonsPanelComponent {
     const selected = this.selectionService.selectedValues();
     if (selected.length === 0) return;
 
-    selected.slice(0, 1).forEach((item, index) => {
+    selected.slice(0, UI.MAX_CONCURRENT_LINKS).forEach((item, index) => {
       setTimeout(() => {
         const link = this.coinLinksService.tradingViewLink(item.symbol, item.exchanges);
         if (link) window.open(link, '_blank');
-      }, index * 1000);
+      }, index * TIMING.LINK_OPEN_DELAY);
     });
     this.selectionService.clear();
   }
@@ -87,8 +87,6 @@ export class ButtonsPanelComponent {
         allImages = allImages.concat(alert.imagesUrls);
       }
     });
-
-    console.log('allImages', allImages);
 
     this.dialog.open(ScreensViewer, {
       maxWidth: '100vw',

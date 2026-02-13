@@ -5,6 +5,7 @@ import { Observable, firstValueFrom } from 'rxjs';
 import { environment } from '../../environments/environment';
 import { NotificationService } from '../shared/services/notification.service';
 import { Router } from '@angular/router';
+import { LoggerService } from '../shared/services/logger.service';
 
 @Injectable({
   providedIn: 'root',
@@ -14,6 +15,7 @@ export class AuthService {
   private http = inject(HttpClient);
   private notification = inject(NotificationService);
   private router = inject(Router);
+  private logger = inject(LoggerService);
 
   user$: Observable<User | null> = user(this.auth);
 
@@ -27,7 +29,8 @@ export class AuthService {
       }
 
       const isAllowed = await this.checkEmailOnBackend(email);
-      console.log('Is Allowed:', isAllowed, email);
+      this.logger.debug('Email check result:', { email, isAllowed });
+
       if (!isAllowed) {
         await signOut(this.auth);
         this.notification.error('Access Denied: Your email is not in the allowed list.');
@@ -37,9 +40,8 @@ export class AuthService {
       // ✅ Успех обрабатываем здесь
       this.router.navigate(['/triggered/line']);
     } catch (error: any) {
-      console.error('Auth Service Login Error:', error);
-      // ✅ Ошибку обрабатываем здесь
-      //this.notification.error(error.message || 'Login failed');
+      this.logger.error('Auth Service Login Error:', error);
+      this.notification.error(error.message || 'Login failed');
       throw error; // Пробрасываем ошибку дальше, если компоненту нужно остановить спиннер
     }
   }
@@ -56,8 +58,9 @@ export class AuthService {
       );
       return response.exists;
     } catch (error) {
-      console.error('API Email Check Failed:', error);
+      this.logger.error('API Email Check Failed:', error);
       return false;
     }
   }
+
 }

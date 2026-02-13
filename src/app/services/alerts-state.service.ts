@@ -1,46 +1,69 @@
 import { Injectable, computed, inject, signal } from '@angular/core';
 import { UniversalAlertsApiService } from './universal-alerts-api.service';
 import { AlertBase, AlertType } from '../../models/alerts';
+import { LoggerService } from '../shared/services/logger.service';
+import { TIMING } from '../../consts';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlertsStateService {
   private api = inject(UniversalAlertsApiService);
+  private logger = inject(LoggerService);
 
   // --- СОСТОЯНИЕ (SIGNALS) ---
   readonly alerts = signal<AlertBase[]>([]);
   readonly isLoading = signal<boolean>(false);
+  readonly error = signal<string | null>(null); // ✅ НОВОЕ: Состояние ошибки
   readonly count = computed(() => this.alerts().length);
+  readonly hasError = computed(() => this.error() !== null); // ✅ Удобный computed
 
   // --- ДЕЙСТВИЯ (ACTIONS) ---
 
   /**
    * Загружает сработавшие алерты
-   * Ждет минимум 1.5 секунды (1 цикл анимации CSS), чтобы не было мерцания
+   * Ждет минимум 1.2 секунды (1 цикл анимации CSS), чтобы не было мерцания
    */
   async loadTriggeredAlerts(type: AlertType): Promise<void> {
     this.isLoading.set(true);
+    this.error.set(null); // ✅ Сбрасываем предыдущую ошибку
 
-    // 1. Создаем таймер на 1500мс (время анимации из CSS)
-    const minAnimationTime$ = new Promise((resolve) => setTimeout(resolve, 1200));
+    // 1. Создаем таймер на минимальное время анимации
+    const minAnimationTime$ = new Promise((resolve) => setTimeout(resolve, TIMING.MIN_LOADING_ANIMATION));
 
     // 2. Создаем запрос к API
     const dataRequest$ = this.api.getAlertsAsync<AlertBase>(type, 'triggered');
 
     try {
       // 3. Ждем выполнения ОБОИХ промисов параллельно
-      // Если API ответит за 0.1с, мы все равно будем ждать 1.5с
-      // Если API ответит за 5с, мы будем ждать 5с
       const [_, data] = await Promise.all([minAnimationTime$, dataRequest$]);
 
       this.alerts.set(data);
-    } catch (error) {
-      console.error('State load error:', error);
+      this.error.set(null); // ✅ Успех - очищаем ошибку
+    } catch (error: any) {
+      this.logger.error('State load error:', error);
       this.alerts.set([]);
+
+      // ✅ НОВОЕ: Устанавливаем понятное сообщение об ошибке
+      const errorMessage = error?.message || 'Failed to load alerts. Please try again.';
+      this.error.set(errorMessage);
     } finally {
       this.isLoading.set(false);
     }
+  }
+
+  /**
+   * ✅ НОВОЕ: Повторная попытка загрузки
+   */
+  async retry(type: AlertType): Promise<void> {
+    await this.loadTriggeredAlerts(type);
+  }
+
+  /**
+   * ✅ НОВОЕ: Очистка ошибки вручную
+   */
+  clearError(): void {
+    this.error.set(null);
   }
 
   /**

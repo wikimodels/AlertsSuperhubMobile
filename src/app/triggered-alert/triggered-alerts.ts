@@ -9,11 +9,13 @@ import { AlertCard } from '../alert-card/alert-card';
 import { AlertsStateService } from '../services/alerts-state.service';
 import { ButtonsPanelService } from '../shared/services/buttons-panel.service';
 import { SelectionService } from '../shared/services/generic.selection.service';
+import { ErrorStateComponent } from '../shared/components/error-state/error-state.component';
+import { EmptyStateComponent } from '../shared/components/empty-state/empty-state.component';
 
 @Component({
   selector: 'app-triggered-alerts',
   standalone: true,
-  imports: [CommonModule, AlertCard],
+  imports: [CommonModule, AlertCard, ErrorStateComponent, EmptyStateComponent],
   templateUrl: './triggered-alerts.html',
   styleUrls: ['./triggered-alerts.scss'],
 })
@@ -86,5 +88,12 @@ export class TriggeredAlertsComponent implements OnInit {
 
   onToggleSelection(alert: AlertBase) {
     this.selectionService.toggle(alert);
+  }
+
+  /**
+   * ✅ НОВОЕ: Повторная попытка загрузки при ошибке
+   */
+  onRetry() {
+    this.alertsState.retry(this.currentType);
   }
 }

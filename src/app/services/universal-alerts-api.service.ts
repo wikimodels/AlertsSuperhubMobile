@@ -5,7 +5,8 @@ import { catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment';
 import { NotificationService } from '../shared/services/notification.service';
 import { SnackbarService } from '../shared/services/snackbar.service'; // Добавлено
-import { AlertType, AlertStatus } from '../../models/alerts';
+import { AlertType, AlertStatus, CreateAlertPayload, UpdateAlertPayload } from '../../models/alerts';
+import { LoggerService } from '../shared/services/logger.service';
 
 interface ApiResponse<T = any> {
   success: boolean;
@@ -22,6 +23,7 @@ export class UniversalAlertsApiService {
   private http = inject(HttpClient);
   private notificationService = inject(NotificationService);
   private snackbarService = inject(SnackbarService); // Внедряем новый сервис
+  private logger = inject(LoggerService);
 
   private readonly baseUrl = environment.alertsUrl;
 
@@ -36,12 +38,11 @@ export class UniversalAlertsApiService {
       if (error.error instanceof ErrorEvent) {
         errorMessage = `Network Error: ${error.error.message}`;
       } else {
-        errorMessage = `Ошибка ${error.status}: ${
-          error.error?.message || error.error?.error || error.message
-        }`;
+        errorMessage = `Ошибка ${error.status}: ${error.error?.message || error.error?.error || error.message
+          }`;
       }
       const fullMessage = `${action} — ${errorMessage}`;
-      console.error(`[UniversalApi] ${fullMessage}`, error);
+      this.logger.error(`[UniversalApi] ${fullMessage}`, error);
       this.notificationService.error(fullMessage);
       return throwError(() => new Error(fullMessage));
     };
@@ -83,7 +84,11 @@ export class UniversalAlertsApiService {
   // ➕ ADD
   // ============================================
 
-  public async addAlertAsync(type: AlertType, status: AlertStatus, alert: any): Promise<boolean> {
+  public async addAlertAsync(
+    type: AlertType,
+    status: AlertStatus,
+    alert: CreateAlertPayload
+  ): Promise<boolean> {
     const obs$ = this.http.post<ApiResponse>(`${this.baseUrl}/${type}/${status}`, alert).pipe(
       tap(() => {
         this.notificationService.success(`${this.fmt(type)} Alert added to ${this.fmt(status)}`);
@@ -179,7 +184,7 @@ export class UniversalAlertsApiService {
     type: AlertType,
     status: AlertStatus,
     id: string,
-    payload: any
+    payload: UpdateAlertPayload
   ): Promise<boolean> {
     const obs$ = this.http
       .patch<ApiResponse>(`${this.baseUrl}/${type}/${status}/${id}`, payload)

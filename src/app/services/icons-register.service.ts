@@ -3,14 +3,16 @@ import { MatIconRegistry } from '@angular/material/icon';
 import { DomSanitizer } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
 import { lastValueFrom, tap } from 'rxjs';
+import { LoggerService } from '../shared/services/logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
-export class IconsRegistrarService {
+export class IconsRegisterService {
   private iconRegistry = inject(MatIconRegistry);
   private sanitizer = inject(DomSanitizer);
   private http = inject(HttpClient);
+  private logger = inject(LoggerService);
 
   // Возвращаем Promise, чтобы APP_INITIALIZER ждал окончания загрузки
   public registerIcons(): Promise<void> {
@@ -18,7 +20,7 @@ export class IconsRegistrarService {
     const request$ = this.http.get<string[]>('assets/icons-list.json').pipe(
       tap((icons) => {
         if (!icons || icons.length === 0) {
-          console.warn('⚠️ No icons found in assets/icons-list.json');
+          this.logger.warn('⚠️ No icons found in assets/icons-list.json');
           return;
         }
 
@@ -29,7 +31,7 @@ export class IconsRegistrarService {
           );
         });
 
-        console.log(`✅ Registered ${icons.length} icons successfully.`);
+        this.logger.debug(`✅ Registered ${icons.length} icons successfully.`);
       })
     );
 

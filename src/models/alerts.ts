@@ -24,7 +24,7 @@ export interface AlertBase {
 }
 
 // --- Line Alert: наследует всё от AlertBase ---
-export interface LineAlert extends AlertBase {}
+export interface LineAlert extends AlertBase { }
 
 // --- VWAP Alert: расширяет AlertBase специфичными полями ---
 export interface VwapAlert extends AlertBase {
@@ -48,3 +48,7 @@ export type AlertStatus = 'working' | 'archived' | 'triggered';
 export const isAlertType = (x: string): x is AlertType => ['line', 'vwap'].includes(x);
 export const isAlertStatus = (x: string): x is AlertStatus =>
   ['working', 'archived', 'triggered'].includes(x);
+
+// ✅ НОВОЕ: Типы для API payload
+export type CreateAlertPayload = Omit<AlertBase, 'id' | '_id' | 'creationTime' | 'activationTime'>;
+export type UpdateAlertPayload = Partial<Omit<AlertBase, 'id' | '_id'>>;

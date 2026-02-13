@@ -1,24 +1,31 @@
 <div class="alerts-grid-container">
+  <!-- ✅ НОВОЕ: Состояние ошибки -->
+  @if (alertsState.hasError()) {
+  <app-error-state [title]="'Failed to Load Alerts'"
+    [message]="alertsState.error() || 'Something went wrong. Please try again.'" (retry)="onRetry()"></app-error-state>
+  }
 
-  @if (alertsState.isLoading()) {
+  <!-- Состояние загрузки -->
+  @else if (alertsState.isLoading()) {
   <div class="loading-state">
     <p>Загрузка сигналов</p>
   </div>
   }
 
+  <!-- Основной контент -->
   @else {
+  @if (alertsState.alerts().length > 0) {
   <div class="grid">
     @for (alert of alertsState.alerts(); track alert.id) {
     <app-alert-card [alert]="alert" [type]="currentType" [selected]="selectionService.isSelected(alert)"
       (toggle)="onToggleSelection(alert)">
     </app-alert-card>
     }
-
-    @empty {
-    <div class="empty-state">
-      <p>Нет сработавших сигналов ({{ currentType }})</p>
-    </div>
-    }
   </div>
+  } @else {
+  <!-- ✅ НОВОЕ: Пустое состояние -->
+  <app-empty-state [icon]="'notification_important'" [title]="'No Triggered Alerts'"
+    [message]="'When ' + currentType + ' alerts are triggered, they will appear here.'"></app-empty-state>
+  }
   }
 </div>

@@ -12,42 +12,50 @@ export class CoinLinksService {
   }
 
   coinglassLink(symbol: string, exchanges: string[]): string {
+    // Strip USDT suffix if present (symbol comes as ETHUSDT, we need ETH)
+    const baseSymbol = symbol.replace(/USDT$/i, '');
+
     // Приоритет проверок: Binance, затем Bybit (как в оригинале)
     // 1. Binance
     if (this.hasExchange(exchanges, 'binance')) {
-      return `https://www.coinglass.com/tv/Binance_${symbol}USDT`;
+      return `https://www.coinglass.com/tv/Binance_${baseSymbol}USDT`;
     }
 
     // 2. Bybit (только если нет Binance)
     if (this.hasExchange(exchanges, 'bybit')) {
-      return `https://www.coinglass.com/tv/Bybit_${symbol}USDT`;
+      return `https://www.coinglass.com/tv/Bybit_${baseSymbol}USDT`;
     }
 
     return '';
   }
 
   tradingViewLink(symbol: string, exchanges: string[]): string {
+    // Strip USDT suffix if present (symbol comes as ETHUSDT, we need ETH)
+    const baseSymbol = symbol.replace(/USDT$/i, '');
+
     // 1. Check Bybit
     if (this.hasExchange(exchanges, 'bybit')) {
-      return `https://www.tradingview.com/chart?symbol=BYBIT:${symbol}USDT.P`;
+      return `https://www.tradingview.com/chart?symbol=BYBIT:${baseSymbol}USDT.P`;
     }
 
     // 2. Check Binance (если Bybit не сработал)
     if (this.hasExchange(exchanges, 'binance')) {
-      return `https://www.tradingview.com/chart?symbol=BINANCE:${symbol}USDT.P`;
+      return `https://www.tradingview.com/chart?symbol=BINANCE:${baseSymbol}USDT.P`;
     }
 
     return '';
   }
 
   exchangeLink(symbol: string, exchange: string): string {
+    // Strip USDT suffix if present (symbol comes as ETHUSDT, we need ETH)
+    const baseSymbol = symbol.replace(/USDT$/i, '');
     const ex = exchange.toLowerCase();
 
     if (ex.includes('binance')) {
-      return `https://www.binance.com/en/futures/${symbol}USDT`;
+      return `https://www.binance.com/en/futures/${baseSymbol}USDT`;
     }
     if (ex.includes('bybit')) {
-      return `https://www.bybit.com/trade/usdt/${symbol}USDT`;
+      return `https://www.bybit.com/trade/usdt/${baseSymbol}USDT`;
     }
 
     return '';

@@ -3,12 +3,17 @@ import { Injectable } from '@angular/core';
 import { MatSnackBar } from '@angular/material/snack-bar';
 import { SnackbarType } from '../models/snackbar-types.model';
 import { HtmlSnackbarComponent } from '../components/html-snackbar/html-snackbar.component';
+import { LoggerService } from './logger.service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SnackbarService {
-  constructor(private snackBar: MatSnackBar, private http: HttpClient) {}
+  constructor(
+    private snackBar: MatSnackBar,
+    private http: HttpClient,
+    private logger: LoggerService
+  ) { }
 
   /**
    * Generic method to show snackbar with dynamic message and action
@@ -44,7 +49,7 @@ export class SnackbarService {
         });
       },
       error: (error) => {
-        console.error('Failed to load SVG file:', error);
+        this.logger.error('Failed to load SVG file:', error);
         this.showSnackBar('Error loading icon', '', 3000, SnackbarType.Error);
       },
     });

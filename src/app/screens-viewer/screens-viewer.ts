@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { MAT_DIALOG_DATA, MatDialogRef, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
+import { UI } from '../../consts';
 
 export interface ScreensViewerData {
   images: string[];
@@ -82,7 +83,7 @@ export class ScreensViewer {
   }
 
   private handleSwipe() {
-    const threshold = 50;
+    const threshold = UI.SWIPE_THRESHOLD;
     if (this.touchEndX < this.touchStartX - threshold) {
       this.next();
     }

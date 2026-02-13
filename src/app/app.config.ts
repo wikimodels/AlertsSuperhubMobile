@@ -16,7 +16,7 @@ import { MAT_FORM_FIELD_DEFAULT_OPTIONS } from '@angular/material/form-field';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async';
 import { provideAnimations } from '@angular/platform-browser/animations';
 import { MatSnackBarModule } from '@angular/material/snack-bar'; // ✅ Добавлено
-import { IconsRegistrarService } from './services/icons-registrar.service';
+import { IconsRegisterService } from './services/icons-register.service';
 
 // --- Firebase Imports ---
 import { initializeApp, provideFirebaseApp } from '@angular/fire/app';
@@ -46,8 +46,8 @@ export const appConfig: ApplicationConfig = {
 
     // --- Init ---
     provideAppInitializer(() => {
-      const registrar = inject(IconsRegistrarService);
-      return registrar.registerIcons();
+      const register = inject(IconsRegisterService);
+      return register.registerIcons();
     }),
 
     // --- Material Options ---

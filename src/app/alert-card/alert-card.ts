@@ -27,18 +27,29 @@ export class AlertCard {
     const str = (a as VwapAlert).anchorTimeStr;
     if (!str) return 'N/A';
 
-    const date = new Date(str);
+    return this.formatDate(str);
+  });
+
+  // ✅ Форматирование даты активации: "13 Feb 2026 16:30"
+  activationTimeFormatted = computed(() => {
+    const str = this.alert().activationTimeStr;
+    if (!str) return 'N/A';
+    return this.formatDate(str);
+  });
+
+  private formatDate(dateStr: string): string {
+    const date = new Date(dateStr);
     if (isNaN(date.getTime())) return 'N/A';
 
+    const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
     const pad = (n: number) => n.toString().padStart(2, '0');
 
+    const day = date.getDate();
+    const month = months[date.getMonth()];
     const year = date.getFullYear();
-    const month = pad(date.getMonth() + 1);
-    const day = pad(date.getDate());
     const hours = pad(date.getHours());
     const minutes = pad(date.getMinutes());
-    const seconds = pad(date.getSeconds());
 
-    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
-  });
+    return `${day} ${month} ${year} ${hours}:${minutes}`;
+  }
 }

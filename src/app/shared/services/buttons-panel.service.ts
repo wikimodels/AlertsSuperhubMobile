@@ -1,5 +1,6 @@
 import { Injectable, signal } from '@angular/core';
 import { Subject } from 'rxjs';
+import { TIMING } from '../../../consts';
 
 @Injectable({ providedIn: 'root' })
 export class ButtonsPanelService {
@@ -61,7 +62,7 @@ export class ButtonsPanelService {
     this._toggleRefresh.next();
     // Логика UI: крутим иконку 1 секунду
     this._isRotating.set(true);
-    setTimeout(() => this._isRotating.set(false), 1000);
+    setTimeout(() => this._isRotating.set(false), TIMING.REFRESH_ROTATION_DURATION);
   }
 
   // Toggle Sort Direction

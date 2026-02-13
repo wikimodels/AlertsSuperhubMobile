@@ -1,11 +1,14 @@
-<mat-card class="alert-card mat-elevation-z4" [class.selected]="selected()" matRipple (click)="toggle.emit()">
+<mat-card class="alert-card mat-elevation-z4" [class.selected]="selected()" matRipple
+  [matRippleColor]="'rgba(245, 158, 11, 0.3)'" (click)="toggle.emit()">
 
   <div class="card-header">
-    <img [src]="alert().symbol ? 'assets/logo/' + alert().symbol.toLowerCase() + '.svg' : 'assets/logo/noname.svg'"
-      alt="coin logo" class="coin-logo" />
+    <img [src]="alert().logoUrl || 'assets/logo/' + alert().symbol.toLowerCase() + '.svg'" [alt]="alert().symbol"
+      class="coin-logo" (error)="$event.target.src='assets/logo/noname.svg'" />
     <div class="symbol-info">
       <span class="symbol">{{ alert().symbol }}</span>
+      @if (alert().category) {
       <span class="category badge">Cat {{ alert().category }}</span>
+      }
     </div>
     <img [src]="type() === 'line' ? 'assets/icons/alarm.svg' : 'assets/icons/anchor.svg'" [alt]="type()"
       class="type-icon" />
@@ -28,7 +31,7 @@
 
     <div class="info-row time">
       <mat-icon class="tiny-icon" svgIcon="smart-alarm"></mat-icon>
-      <span class="value">{{ alert().activationTimeStr }}</span>
+      <span class="value">{{ activationTimeFormatted() }}</span>
     </div>
   </mat-card-content>
 </mat-card>
